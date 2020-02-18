@@ -12,6 +12,8 @@ sock.connect((host, port))
 
 if file_name == '/':
     file_name = '/index.html'
+if file_name[0] != '/':
+    file_name = '/' + file_name
 request = 'GET {0}'.format(file_name)
 sock.sendall(request)
 
