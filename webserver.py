@@ -30,9 +30,13 @@ def handler(conn, addr):
             response_content = b''
             server_header = ''
         
+            # if there is no given path, use index.html
             if path == '/':
                 path = '/index.html'
             cur_path = base_path + path
+            
+            # get file format
+            file_format = path.split('.')[1]
             
             # Check whether the file exists (For 404)
             if os.path.exists(cur_path):
@@ -49,12 +53,22 @@ def handler(conn, addr):
             # we only support GET method now
             server_header = 'HTTP/1.1 405 Method Not Allowed\r\n'
     except:
+        # some exeption happens: internal server error
         server_header = 'HTTP/1.1 500 Internal Server Error\r\n'
     
     # send header remaining part
     current_time = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
     server_header += 'Date: {}\r\n'.format(current_time)
     server_header += 'Server: Eric-Server\r\n'
+    
+    # determine content-type (support url, jpg, and gif) 
+    # If not I don't add content-type
+    if file_format == 'html':
+        server_header += 'Content-Type: text/html\r\n'
+    elif file_format == 'jpg':
+        server_header += 'Content-Type: image/jpeg\r\n'
+    elif file_format == 'gif':
+        server_header += 'Content-Type: image/gif\r\n'
     server_header += 'Connection: close\r\n\r\n'
     print(server_header)
     conn.sendall(server_header)
