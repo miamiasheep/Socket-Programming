@@ -41,8 +41,8 @@ def handler(conn, addr):
             # Check whether the file exists (For 404)
             if os.path.exists(cur_path):
                 # Check Permission (For 403)
-                if(bool(os.stat(cur_path).st_mode)):
-                    with open(base_path + path, 'rb') as fr:
+                if(os.access(cur_path, os.R_OK)):
+                    with open(cur_path, 'rb') as fr:
                         response_content = fr.read()
                     server_header = 'HTTP/1.1 200 OK\r\n'
                 else:
