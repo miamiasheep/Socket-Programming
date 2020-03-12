@@ -14,6 +14,7 @@ s.listen(5)
 
 def handler(conn, addr):
     response_content = b''
+    path = ''
     try:    
         # Parse html request
         request = bytes.decode(data)
@@ -28,18 +29,15 @@ def handler(conn, addr):
             # Get the path
             path = request_words[1]
             response_content = b''
-            server_header = ''
+            server_header = b''
         
             # if there is no given path, use index.html
-            if path == '/':
-                path = '/index.html'
+            if path[-1] == '/':
+                path += 'index.html'
             cur_path = base_path + path
             
-            # get file format
-            file_format = path.split('.')[1]
-            
             # Check whether the file exists (For 404)
-            if os.path.exists(cur_path):
+            if os.path.isfile(cur_path):
                 # Check Permission (For 403)
                 if(os.access(cur_path, os.R_OK)):
                     with open(cur_path, 'rb') as fr:
@@ -55,6 +53,11 @@ def handler(conn, addr):
     except:
         # some exeption happens: internal server error
         server_header = 'HTTP/1.1 500 Internal Server Error\r\n'
+    # get file format
+    words = path.split('.')
+    file_format = ''
+    if len(words) >= 2:
+        file_format = path.split('.')[1]
     
     # send header remaining part
     current_time = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime())
@@ -71,7 +74,7 @@ def handler(conn, addr):
         server_header += 'Content-Type: image/gif\r\n'
     server_header += 'Connection: close\r\n\r\n'
     print(server_header)
-    conn.sendall(server_header)
+    conn.sendall(server_header.encode())
     conn.sendall(response_content)
     conn.close()
     
