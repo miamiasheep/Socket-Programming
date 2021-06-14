@@ -1,2 +1,2 @@
-# cs536_lab1
-lab1 of cs536 in Purdue University
+# Socket Progamming
+Socket Programming using python.
